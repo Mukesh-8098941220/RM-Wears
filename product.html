@@ -1,0 +1,252 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Search & Filter - Sportify</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    header, footer {
+      background-color: #111;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .filters {
+      max-width: 1000px;
+      margin: 2rem auto 1rem;
+      background: white;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .filters input, .filters select {
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .product-grid {
+      max-width: 1100px;
+      margin: 2rem auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 2rem;
+      justify-items: center;
+    }
+
+    .product {
+      background-color: white;
+      position: relative;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 250px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .product:hover {
+      transform: scale(1.03);
+    }
+
+    .product img {
+      width: 100%;
+      border-radius: 8px;
+      height: auto;
+      max-height: 200px;
+      object-fit: contain;
+    }
+
+    .product h3 {
+      font-size: 1.5rem;
+      margin-top: 15px;
+    }
+
+    .product .description {
+      font-size: 1rem;
+      margin: 10px 0;
+      color: #555;
+    }
+
+    .product .price {
+      font-size: 1.2rem;
+      color: #e74c3c;
+      font-weight: bold;
+    }
+
+    .product .add-to-cart {
+      background-color: #16a085;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+
+    .product .add-to-cart:hover {
+      background-color: #43ccb3;
+    }
+
+    .no-results {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 1.2rem;
+      color: #777;
+    }
+
+    footer {
+      background-color: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h2>RM wears</h2>
+  </header>
+
+  <div class="filters">
+    <input type="text" id="searchInput" placeholder="Search by product name..." />
+    <input type="number" id="minPrice" placeholder="Min ₹ Price" />
+    <input type="number" id="maxPrice" placeholder="Max ₹ Price" />
+    <select id="categorySelect">
+      <option value="">All Categories</option>
+      <option value="t-shirt">T-Shirts</option>
+      <option value="shoe">Shoes</option>
+      <option value="pant">Track Pants</option>
+      <option value="set">Sportswear Sets</option>
+    </select>
+  </div>
+
+  <div class="product-grid" id="productGrid"></div>
+  <div class="no-results" id="noResults" style="display: none;">No matching products found.</div>
+
+  <footer>
+    <p>&copy; 2025 Sportify. All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    // Sample static product data (you can load from localStorage too)
+    const allProducts = [
+      {
+        id: 1,
+        name: "T-Shirt",
+        category: "t-shirt",
+        price: 550,
+        image: "tshirt.avif",
+        description: "Comfortable T-Shirt from trending wears."
+      },
+      {
+        id: 2,
+        name: "White T-Shirt",
+        category: "t-shirt",
+        price: 750,
+        image: "white.jpg",
+        description: "Stylish white T-shirt."
+      },
+      {
+        id: 3,
+        name: "Track Pant",
+        category: "pant",
+        price: 1550,
+        image: "pant.jpg",
+        description: "Comfortable track pant."
+      },
+      {
+        id: 4,
+        name: "Black Pant",
+        category: "pant",
+        price: 1350,
+        image: "b pant.webp",
+        description: "Black pant for casual and sports use."
+      },
+      {
+        id: 5,
+        name: "Running Shoes",
+        category: "shoe",
+        price: 1550,
+        image: "run.webp",
+        description: "High-performance running shoes."
+      }
+    ];
+
+    const grid = document.getElementById("productGrid");
+    const noResults = document.getElementById("noResults");
+
+    const searchInput = document.getElementById("searchInput");
+    const minPrice = document.getElementById("minPrice");
+    const maxPrice = document.getElementById("maxPrice");
+    const categorySelect = document.getElementById("categorySelect");
+
+    function renderProducts(products) {
+      grid.innerHTML = "";
+      if (products.length === 0) {
+        noResults.style.display = "block";
+        return;
+      }
+      noResults.style.display = "none";
+
+      products.forEach(product => {
+        const card = document.createElement("div");
+        card.className = "product";
+        card.innerHTML = `
+          <img src="${product.image}" alt="${product.name}" />
+          <h3>${product.name}</h3>
+          <p class="description">${product.description}</p>
+          <p class="price">₹${product.price.toFixed(2)}</p>
+          <button class="add-to-cart">Add to Cart</button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function applyFilters() {
+      let filtered = [...allProducts];
+      const searchText = searchInput.value.toLowerCase();
+      const min = parseFloat(minPrice.value) || 0;
+      const max = parseFloat(maxPrice.value) || Infinity;
+      const category = categorySelect.value;
+
+      filtered = filtered.filter(p =>
+        p.name.toLowerCase().includes(searchText) &&
+        p.price >= min &&
+        p.price <= max &&
+        (category === "" || p.category === category)
+      );
+
+      renderProducts(filtered);
+    }
+
+    // Event listeners
+    searchInput.addEventListener("input", applyFilters);
+    minPrice.addEventListener("input", applyFilters);
+    maxPrice.addEventListener("input", applyFilters);
+    categorySelect.addEventListener("change", applyFilters);
+
+    // Initial render
+    renderProducts(allProducts);
+  </script>
+</body>
+</html>
